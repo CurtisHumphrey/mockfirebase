@@ -6,7 +6,6 @@ var _            = require('lodash');
 var Queue        = require('../../src/queue').Queue;
 var FlushEvent   = require('../../src/queue').Event;
 var EventEmitter = require('events').EventEmitter;
-var Firebase  = require('../../').MockFirebase;
 
 describe('FlushQueue', function () {
 
@@ -138,22 +137,4 @@ describe('FlushEvent', function () {
 
   });
 
-  describe('During a flush', function() {
-    it('should add new events such that they run after the current event', function() {
-      //This prevents stack overflow - error is when the stack overflows
-      var ref = new Firebase();
-      ref.autoFlush();
-
-      ref.child('key').on('value', function(snapshot){
-        if(snapshot.val() === null)
-        {
-          snapshot.ref().set('new value');
-        }
       });
-
-      expect(ref.child('key').getData()).to.equal('new value');
-    });
-
-  });
-
-});

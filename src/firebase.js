@@ -30,7 +30,6 @@ function MockFirebase (path, data, parent, name) {
   this.data = null;
   this._dataChanged(_.cloneDeep(data) || null);
   this._lastAutoId = null;
-  this._clientAutoId = null;
   _.extend(this, Auth.prototype, new Auth());
 }
 

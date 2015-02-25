@@ -72,6 +72,13 @@ describe('FlushQueue', function () {
       expect(spy.called).to.equal(true);
     });
 
+    it('prevents recursive flush calls', function () {
+      queue.push(function () {
+        queue.flush();
+      });
+      queue.flush();
+    });
+
     it('can invoke events after a delay', function () {
       var clock = sinon.useFakeTimers();
       queue.push(spy);
@@ -79,13 +86,6 @@ describe('FlushQueue', function () {
       expect(spy.called).to.equal(false);
       clock.tick(100);
       expect(spy.called).to.equal(true);
-    });
-
-    it('removes internal event listeners immediately', function () {
-      queue.push(_.noop);
-      var event = queue.getEvents()[0];
-      queue.flush();
-      expect(EventEmitter.listenerCount(event, 'cancel')).to.equal(0);
     });
 
   });

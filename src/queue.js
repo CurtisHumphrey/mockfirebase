@@ -23,15 +23,20 @@ FlushQueue.prototype.push = function () {
   }));
 };
 
+FlushQueue.prototype.flushing = false;
+
 FlushQueue.prototype.flush = function (delay) {
+  if (this.flushing) return;
   var self = this;
   if (!this.events.length) {
     throw new Error('No deferred tasks to be flushed');
   }
   function process () {
-    while (self.events.length && !self.events[0].isRunning) {
+    self.flushing = true;
+    while (self.events.length) {
       self.events[0].run();
     }
+    self.flushing = false;
   }
   if (_.isNumber(delay)) {
     setTimeout(process, delay);
@@ -50,7 +55,6 @@ function FlushEvent (fn, context, sourceData) {
   this.context = context;
   // stores data about the event so that we can filter items in the queue
   this.sourceData = sourceData;
-  this.isRunning = false;
 
   EventEmitter.call(this);
 }
@@ -58,7 +62,6 @@ function FlushEvent (fn, context, sourceData) {
 util.inherits(FlushEvent, EventEmitter);
 
 FlushEvent.prototype.run = function () {
-  this.isRunning = true;
   this.fn.call(this.context);
   this.emit('done', this);
 };
